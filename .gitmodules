@@ -1,0 +1,3 @@
+[submodule "shop-scrapper"]
+	path = shop-scrapper
+	url = git@github.com:Kasparas-G55/shop-scrapper.git
