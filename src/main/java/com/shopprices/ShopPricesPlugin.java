@@ -1,53 +1,86 @@
 package com.shopprices;
 
 import javax.inject.Inject;
+
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.ItemComposition;
-import net.runelite.api.events.GameTick;
-import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.widgets.Widget;
-import net.runelite.client.callback.ClientThread;
-import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.OverlayManager;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Shop Prices"
+	name = "Shop Prices",
+    description = "Display prices for items in NPC stores.",
+    tags = { "qol", "shop", "prices" }
 )
 public class ShopPricesPlugin extends Plugin {
 	@Inject
 	private Client client;
 
     @Inject
-    private ClientThread clientThread;
-
-    @Inject
     private ItemManager itemManager;
 
-    @Subscribe
-    public void onGameTick(GameTick event) {
-        Widget shop = client.getWidget(InterfaceID.Shopmain.ITEMS);
+    @Inject
+    private OverlayManager overlayManager;
 
-        if (shop == null)
-            return;
+    @Inject
+    private ShopPricesOverlay shopPricesOverlay;
 
-        Widget[] items = shop.getChildren();
+    @Inject
+    private Gson gson;
 
-        if (items == null)
-            return;
+    public static Map<String, Store> stores;
+    public final static String STORE_KEY_PATTERN = "[^a-zA-Z ]+";
 
-        ItemComposition composition = itemManager.getItemComposition(items[3].getItemId());
-        log.debug("Item {}: {}gp", composition.getName(), ShopPricesPlugin.getBuyPrice(composition.getPrice(), items[3].getItemQuantity()));
+    public static class Store {
+        public int sellMultiplier;
+        public float storeDelta;
+        public Map<String, Integer> items;
     }
 
-    static int getBuyPrice(int itemValue, int itemStock) {
-        int stockDelta = 5 - itemStock;
+    @Override
+    protected void startUp() {
+        overlayManager.add(shopPricesOverlay);
 
-        return Math.max(itemValue * (130 + (3 * stockDelta)) / 100, 30 * itemValue / 100);
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("stores.json");
+
+        if (stream == null)
+            throw new IllegalArgumentException("File not found.");
+
+        try (InputStreamReader reader = new InputStreamReader(stream)) {
+            Type storeMapType = new TypeToken<Map<String, Store>>(){}.getType();
+            ShopPricesPlugin.stores = gson.fromJson(reader, storeMapType);
+            stream.close();
+        } catch (IOException e) {
+            log.error("Failed to read JSON file: {}", e.getMessage());
+        }
+
+    }
+
+    @Override
+    protected void shutDown() {
+        overlayManager.remove(shopPricesOverlay);
+        stores.clear();
+    }
+
+    public static String formatStoreKey(String storeName) {
+        return String.join("_", storeName.replaceAll(STORE_KEY_PATTERN, "").toUpperCase().split(" "));
+    }
+
+    public static int getSellPrice(int itemValue, int sellMultiplier, int itemStock, int defaultStock, float storeDelta) {
+        int stockDelta = defaultStock - itemStock;
+
+        return (int) Math.max(itemValue * (sellMultiplier + (storeDelta * stockDelta)) / 100, storeDelta * itemValue / 100);
     }
 }
