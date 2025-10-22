@@ -1,7 +1,5 @@
 package com.shopprices;
 
-import javax.inject.Inject;
-
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +9,13 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.Map;
-import java.util.regex.Pattern;
+
 
 @Slf4j
 @PluginDescriptor(
@@ -25,8 +24,8 @@ import java.util.regex.Pattern;
     tags = { "qol", "shop", "prices" }
 )
 public class ShopPricesPlugin extends Plugin {
-	@Inject
-	private Client client;
+    @Inject
+    private Client client;
 
     @Inject
     private ItemManager itemManager;
@@ -55,8 +54,9 @@ public class ShopPricesPlugin extends Plugin {
 
         InputStream stream = getClass().getClassLoader().getResourceAsStream("stores.json");
 
-        if (stream == null)
+        if (stream == null) {
             throw new IllegalArgumentException("File not found.");
+        }
 
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             Type storeMapType = new TypeToken<Map<String, Store>>(){}.getType();
@@ -78,9 +78,12 @@ public class ShopPricesPlugin extends Plugin {
         return String.join("_", storeName.replaceAll(STORE_KEY_PATTERN, "").toUpperCase().split(" "));
     }
 
-    public static int getSellPrice(int itemValue, int sellMultiplier, int itemStock, int defaultStock, float storeDelta) {
+    public static int getSellPrice(int itemValue, int sellMult, int itemStock, int defaultStock, float storeDelta) {
         int stockDelta = defaultStock - itemStock;
 
-        return (int) Math.max(itemValue * (sellMultiplier + (storeDelta * stockDelta)) / 100, storeDelta * itemValue / 100);
+        return (int) Math.max(
+            itemValue * (sellMult + (storeDelta * stockDelta)) / 100,
+            storeDelta * itemValue / 100
+        );
     }
 }

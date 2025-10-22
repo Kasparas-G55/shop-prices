@@ -14,14 +14,12 @@ import javax.inject.Inject;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Dimension;
-import java.util.Arrays;
 
 @Slf4j
 public class ShopPricesOverlay extends Overlay {
 
     private final Client client;
     private final ItemManager itemManager;
-    private final ShopPricesPlugin plugin;
 
     private static final int PRICE_PADDING = 10;
 
@@ -29,7 +27,6 @@ public class ShopPricesOverlay extends Overlay {
     ShopPricesOverlay(ShopPricesPlugin plugin, Client client, ItemManager itemManager) {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
-        this.plugin = plugin;
         this.client = client;
         this.itemManager = itemManager;
     }
@@ -39,27 +36,31 @@ public class ShopPricesOverlay extends Overlay {
         Widget shop = client.getWidget(InterfaceID.Shopmain.ITEMS);
         Widget frame = client.getWidget(InterfaceID.Shopmain.FRAME);
 
-        if (shop == null || frame == null)
+        if (shop == null || frame == null) {
             return null;
+        }
 
         Widget[] items = shop.getDynamicChildren();
         Widget[] frameChildren = frame.getDynamicChildren();
 
-        if (items == null || frameChildren == null)
+        if (items == null || frameChildren == null) {
             return null;
+        }
 
         String shopName = ShopPricesPlugin.formatStoreKey(frameChildren[1].getText());
 
         for (Widget item : items) {
-            if (item.getItemId() == -1 || item.getName().isBlank())
+            if (item.getItemId() == -1 || item.getName().isBlank()) {
                 continue;
+            }
 
             ItemComposition composition = itemManager.getItemComposition(item.getItemId());
             ShopPricesPlugin.Store store = ShopPricesPlugin.stores.get(shopName);
             Integer defaultStock = store.items.get(composition.getName());
 
-            if (defaultStock == null)
+            if (defaultStock == null) {
                 defaultStock = 0;
+            }
 
 
             int sellPrice = ShopPricesPlugin.getSellPrice(
