@@ -21,7 +21,7 @@ import java.util.Map;
 @Slf4j
 @PluginDescriptor(
     name = "Shop Prices",
-    description = "Display prices for items in NPC stores.",
+    description = "Display prices for items in NPC shops.",
     tags = {"qol", "shop", "prices"}
 )
 public class ShopPricesPlugin extends Plugin {
@@ -40,26 +40,26 @@ public class ShopPricesPlugin extends Plugin {
     @Inject
     private Gson gson;
 
-    public static Map<String, Store> stores = new HashMap<>();
+    public static Map<String, Shop> shopsMap = new HashMap<>();
     public static final String STORE_KEY_PATTERN = "[^a-zA-Z ]+";
 
-    public static class Store {
+    public static class Shop {
         public int sellMultiplier;
-        public float storeDelta;
-        public Map<String, Integer> items;
+        public float shopDelta;
+        public Map<String, Integer> itemStocks;
     }
 
     @Override
     protected void startUp() {
-        InputStream stream = getClass().getClassLoader().getResourceAsStream("stores.json");
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("shops.json");
 
         if (stream == null) {
             throw new IllegalArgumentException("Resource not found.");
         }
 
         try (InputStreamReader reader = new InputStreamReader(stream)) {
-            Type storeMapType = new TypeToken<Map<String, Store>>(){}.getType();
-            ShopPricesPlugin.stores = gson.fromJson(reader, storeMapType);
+            Type storeMapType = new TypeToken<Map<String, Shop>>(){}.getType();
+            ShopPricesPlugin.shopsMap = gson.fromJson(reader, storeMapType);
             overlayManager.add(shopPricesOverlay);
         } catch (IOException e) {
             log.error("Failed to read JSON file: {}", e.getMessage());
@@ -69,7 +69,7 @@ public class ShopPricesPlugin extends Plugin {
     @Override
     protected void shutDown() {
         overlayManager.remove(shopPricesOverlay);
-        stores.clear();
+        shopsMap.clear();
     }
 
     public static String formatStoreKey(String storeName) {

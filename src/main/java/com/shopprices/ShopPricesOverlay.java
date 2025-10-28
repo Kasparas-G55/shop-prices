@@ -33,30 +33,30 @@ public class ShopPricesOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
-        Widget shop = client.getWidget(InterfaceID.Shopmain.ITEMS);
-        Widget frame = client.getWidget(InterfaceID.Shopmain.FRAME);
+        Widget shopWidget = client.getWidget(InterfaceID.Shopmain.ITEMS);
+        Widget frameWidget = client.getWidget(InterfaceID.Shopmain.FRAME);
 
-        if (shop == null || frame == null) {
+        if (shopWidget == null || frameWidget == null) {
             return null;
         }
 
-        Widget[] items = shop.getDynamicChildren();
-        Widget[] frameChildren = frame.getDynamicChildren();
+        Widget[] shopItems = shopWidget.getDynamicChildren();
+        Widget[] frameChildren = frameWidget.getDynamicChildren();
 
-        if (items == null || frameChildren == null) {
+        if (shopItems == null || frameChildren == null) {
             return null;
         }
 
         String shopName = ShopPricesPlugin.formatStoreKey(frameChildren[1].getText());
 
-        for (Widget item : items) {
+        for (Widget item : shopItems) {
             if (item.getItemId() == -1 || item.getName().isBlank()) {
                 continue;
             }
 
             ItemComposition composition = itemManager.getItemComposition(item.getItemId());
-            ShopPricesPlugin.Store store = ShopPricesPlugin.stores.get(shopName);
-            Integer defaultStock = store.items.get(composition.getName());
+            ShopPricesPlugin.Shop shop = ShopPricesPlugin.shopsMap.get(shopName);
+            Integer defaultStock = shop.itemStocks.get(composition.getName());
 
             if (defaultStock == null) {
                 defaultStock = 0;
@@ -64,10 +64,10 @@ public class ShopPricesOverlay extends Overlay {
 
             int sellPrice = ShopPricesPlugin.getSellPrice(
                 composition.getPrice(),
-                store.sellMultiplier,
+                shop.sellMultiplier,
                 item.getItemQuantity(),
                 defaultStock,
-                store.storeDelta
+                shop.shopDelta
             );
 
             Rectangle bounds = item.getBounds();
