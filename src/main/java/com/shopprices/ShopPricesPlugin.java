@@ -2,8 +2,11 @@ package com.shopprices;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.inject.Provides;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -24,7 +27,7 @@ import java.util.Map;
 @PluginDescriptor(
     name = "Shop Prices",
     description = "Display prices for items in NPC shops.",
-    tags = {"qol", "shop", "prices"}
+    tags = {"qol", "shop", "prices", "overlay"}
 )
 public class ShopPricesPlugin extends Plugin {
     @Inject
@@ -42,11 +45,20 @@ public class ShopPricesPlugin extends Plugin {
     @Inject
     private ShopPricesOverlay shopPricesOverlay;
 
+    @Getter
+    @Inject
+    private ShopPricesConfig config;
+
     @Inject
     private Gson gson;
 
     public static Map<String, Shop> shopsMap = new HashMap<>();
     public static final String SHOP_KEY_PATTERN = "[^a-zA-Z ]+";
+
+    @Provides
+    ShopPricesConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(ShopPricesConfig.class);
+    }
 
     @Override
     protected void startUp() {

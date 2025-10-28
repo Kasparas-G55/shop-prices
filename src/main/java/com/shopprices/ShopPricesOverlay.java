@@ -34,11 +34,13 @@ public class ShopPricesOverlay extends Overlay {
     private final Client client;
     private final ItemManager itemManager;
     private final TooltipManager tooltipManager;
+    private final ShopPricesPlugin plugin;
 
     @Inject
-    ShopPricesOverlay(ShopPricesPlugin plugin, Client client, ItemManager itemManager, TooltipManager tooltipManager) {
+    public ShopPricesOverlay(ShopPricesPlugin plugin, Client client, ItemManager itemManager, TooltipManager tooltipManager) {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_WIDGETS);
+        this.plugin = plugin;
         this.client = client;
         this.itemManager = itemManager;
         this.tooltipManager = tooltipManager;
@@ -66,31 +68,40 @@ public class ShopPricesOverlay extends Overlay {
                 continue;
             }
 
-            ItemComposition itemComposition = itemManager.getItemComposition(itemWidget.getItemId());
             Shop activeShop = ShopPricesPlugin.shopsMap.get(shopName);
-            Integer defaultStock = activeShop.itemStocks.get(itemComposition.getName());
 
-            if (defaultStock == null) {
-                defaultStock = 0;
+            if (plugin.getConfig().displayOverlay()) {
+                onDisplayOverlay(graphics, activeShop, itemWidget);
             }
 
-            int sellPrice = ShopPricesPlugin.getSellPrice(
-                itemComposition.getPrice(),
-                activeShop.sellMultiplier,
-                itemWidget.getItemQuantity(),
-                defaultStock,
-                activeShop.shopDelta
-            );
-
-            String sellValue = ShopPricesPlugin.formatValue(sellPrice);
-
-            Rectangle bounds = itemWidget.getBounds();
-            graphics.drawString(sellValue, bounds.x, (int) bounds.getMaxY() + PRICE_PADDING);
-
-            onDisplayTooltip(activeShop, itemWidget);
+            if (plugin.getConfig().displayTooltip()) {
+                onDisplayTooltip(activeShop, itemWidget);
+            }
         }
 
         return null;
+    }
+
+    private void onDisplayOverlay(Graphics2D graphics, Shop activeShop, Widget itemWidget) {
+        ItemComposition itemComposition = itemManager.getItemComposition(itemWidget.getItemId());
+        Integer defaultStock = activeShop.itemStocks.get(itemComposition.getName());
+
+        if (defaultStock == null) {
+            defaultStock = 0;
+        }
+
+        int sellPrice = ShopPricesPlugin.getSellPrice(
+            itemComposition.getPrice(),
+            activeShop.sellMultiplier,
+            itemWidget.getItemQuantity(),
+            defaultStock,
+            activeShop.shopDelta
+        );
+
+        String sellValue = ShopPricesPlugin.formatValue(sellPrice);
+
+        Rectangle bounds = itemWidget.getBounds();
+        graphics.drawString(sellValue, bounds.x, (int) bounds.getMaxY() + PRICE_PADDING);
     }
 
     private void onDisplayTooltip(Shop activeShop, Widget itemWidget) {
