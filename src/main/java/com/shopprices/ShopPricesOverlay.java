@@ -71,7 +71,11 @@ public class ShopPricesOverlay extends Overlay {
             );
 
             Rectangle bounds = item.getBounds();
-            graphics.drawString(sellPrice + "gp", bounds.x, (int) bounds.getMaxY() + PRICE_PADDING);
+            graphics.drawString(
+                ShopPricesPlugin.formatValue(sellPrice),
+                bounds.x,
+                (int) bounds.getMaxY() + PRICE_PADDING
+            );
         }
 
         return null;

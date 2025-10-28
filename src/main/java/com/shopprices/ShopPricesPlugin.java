@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,6 +75,11 @@ public class ShopPricesPlugin extends Plugin {
 
     public static String formatStoreKey(String storeName) {
         return String.join("_", storeName.replaceAll(STORE_KEY_PATTERN, "").toUpperCase().split(" "));
+    }
+
+    public static String formatValue(double value) {
+        DecimalFormat formatter = new DecimalFormat("#,###,###,###gp");
+        return formatter.format(value);
     }
 
     public static int getSellPrice(int itemValue, int sellMult, int itemStock, int defaultStock, float storeDelta) {
