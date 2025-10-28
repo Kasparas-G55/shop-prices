@@ -14,14 +14,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 
 
 @Slf4j
 @PluginDescriptor(
-	name = "Shop Prices",
+    name = "Shop Prices",
     description = "Display prices for items in NPC stores.",
-    tags = { "qol", "shop", "prices" }
+    tags = {"qol", "shop", "prices"}
 )
 public class ShopPricesPlugin extends Plugin {
     @Inject
@@ -39,8 +40,8 @@ public class ShopPricesPlugin extends Plugin {
     @Inject
     private Gson gson;
 
-    public static Map<String, Store> stores;
-    public final static String STORE_KEY_PATTERN = "[^a-zA-Z ]+";
+    public static Map<String, Store> stores = new HashMap<>();
+    public static final String STORE_KEY_PATTERN = "[^a-zA-Z ]+";
 
     public static class Store {
         public int sellMultiplier;
@@ -50,22 +51,19 @@ public class ShopPricesPlugin extends Plugin {
 
     @Override
     protected void startUp() {
-        overlayManager.add(shopPricesOverlay);
-
         InputStream stream = getClass().getClassLoader().getResourceAsStream("stores.json");
 
         if (stream == null) {
-            throw new IllegalArgumentException("File not found.");
+            throw new IllegalArgumentException("Resource not found.");
         }
 
         try (InputStreamReader reader = new InputStreamReader(stream)) {
             Type storeMapType = new TypeToken<Map<String, Store>>(){}.getType();
             ShopPricesPlugin.stores = gson.fromJson(reader, storeMapType);
-            stream.close();
+            overlayManager.add(shopPricesOverlay);
         } catch (IOException e) {
             log.error("Failed to read JSON file: {}", e.getMessage());
         }
-
     }
 
     @Override

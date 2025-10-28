@@ -62,7 +62,6 @@ public class ShopPricesOverlay extends Overlay {
                 defaultStock = 0;
             }
 
-
             int sellPrice = ShopPricesPlugin.getSellPrice(
                 composition.getPrice(),
                 store.sellMultiplier,
