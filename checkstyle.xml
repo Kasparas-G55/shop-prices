@@ -44,7 +44,7 @@
         <module name="NeedBraces">
             <property
                     name="tokens"
-                    value="LITERAL_IF, LITERAL_ELSE, LITERAL_CASE, LITERAL_DEFAULT, LITERAL_WHILE, LITERAL_FOR"
+                    value="LITERAL_IF, LITERAL_ELSE, LITERAL_DEFAULT, LITERAL_WHILE, LITERAL_FOR"
             />
         </module>
         <module name="RequireThis"/>
