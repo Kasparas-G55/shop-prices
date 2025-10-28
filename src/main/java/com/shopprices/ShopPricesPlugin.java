@@ -8,6 +8,7 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.overlay.tooltip.TooltipManager;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -36,19 +37,16 @@ public class ShopPricesPlugin extends Plugin {
     private OverlayManager overlayManager;
 
     @Inject
+    private TooltipManager tooltipManager;
+
+    @Inject
     private ShopPricesOverlay shopPricesOverlay;
 
     @Inject
     private Gson gson;
 
     public static Map<String, Shop> shopsMap = new HashMap<>();
-    public static final String STORE_KEY_PATTERN = "[^a-zA-Z ]+";
-
-    public static class Shop {
-        public int sellMultiplier;
-        public float shopDelta;
-        public Map<String, Integer> itemStocks;
-    }
+    public static final String SHOP_KEY_PATTERN = "[^a-zA-Z ]+";
 
     @Override
     protected void startUp() {
@@ -59,8 +57,8 @@ public class ShopPricesPlugin extends Plugin {
         }
 
         try (InputStreamReader reader = new InputStreamReader(stream)) {
-            Type storeMapType = new TypeToken<Map<String, Shop>>(){}.getType();
-            ShopPricesPlugin.shopsMap = gson.fromJson(reader, storeMapType);
+            Type shopMapType = new TypeToken<Map<String, Shop>>(){}.getType();
+            ShopPricesPlugin.shopsMap = gson.fromJson(reader, shopMapType);
             overlayManager.add(shopPricesOverlay);
         } catch (IOException e) {
             log.error("Failed to read JSON file: {}", e.getMessage());
@@ -73,8 +71,8 @@ public class ShopPricesPlugin extends Plugin {
         shopsMap.clear();
     }
 
-    public static String formatStoreKey(String storeName) {
-        return String.join("_", storeName.replaceAll(STORE_KEY_PATTERN, "").toUpperCase().split(" "));
+    public static String formatShopKey(String shopName) {
+        return String.join("_", shopName.replaceAll(SHOP_KEY_PATTERN, "").toUpperCase().split(" "));
     }
 
     public static String formatValue(double value) {
@@ -82,12 +80,23 @@ public class ShopPricesPlugin extends Plugin {
         return formatter.format(value);
     }
 
-    public static int getSellPrice(int itemValue, int sellMult, int itemStock, int defaultStock, float storeDelta) {
+    public static int getSellPrice(int itemValue, int sellMult, int itemStock, int defaultStock, float shopDelta) {
         int stockDelta = defaultStock - itemStock;
 
         return (int) Math.max(
-            itemValue * (sellMult + (storeDelta * stockDelta)) / 100,
-            storeDelta * itemValue / 100
+            itemValue * (sellMult + (shopDelta * stockDelta)) / 100,
+            shopDelta * itemValue / 100
         );
+    }
+
+    public static int getTotalSellPrice(int itemValue, int sellMult, int itemStock, int defaultStock, float shopDelta, int buyAmount) {
+        int totalCost = 0;
+
+        for (int x = 0; x < buyAmount; x++) {
+            int currentStock = itemStock - x;
+            totalCost += getSellPrice(itemValue, sellMult, currentStock, defaultStock, shopDelta);
+        }
+
+        return totalCost;
     }
 }
