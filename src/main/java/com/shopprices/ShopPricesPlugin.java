@@ -54,6 +54,7 @@ public class ShopPricesPlugin extends Plugin {
 
     public static Map<String, Shop> shopsMap = new HashMap<>();
     public static final String SHOP_KEY_PATTERN = "[^a-zA-Z ]+";
+    public static final float MIN_SELL_MULTIPLIER = 30.0f;
 
     @Provides
     ShopPricesConfig provideConfig(ConfigManager configManager) {
@@ -100,7 +101,7 @@ public class ShopPricesPlugin extends Plugin {
     public static int getSellPrice(int itemValue, int sellMult, int currentStock, int defaultStock, float shopDelta) {
         return (int) Math.max(
             itemValue * getSellMultiplier(sellMult, defaultStock, currentStock, shopDelta) / 100,
-            Math.max(30.0f * itemValue / 100, 1)
+            Math.max(MIN_SELL_MULTIPLIER * itemValue / 100, 1)
         );
     }
 
