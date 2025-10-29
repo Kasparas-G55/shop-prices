@@ -92,12 +92,15 @@ public class ShopPricesPlugin extends Plugin {
         return formatter.format(value);
     }
 
-    public static int getSellPrice(int itemValue, int sellMult, int itemStock, int defaultStock, float shopDelta) {
-        int stockDelta = defaultStock - itemStock;
+    public static float getSellMultiplier(int sellMult, int defaultStock, int currentStock, float shopDelta) {
+        int stockDelta = defaultStock - currentStock;
+        return sellMult + (shopDelta * stockDelta);
+    }
 
+    public static int getSellPrice(int itemValue, int sellMult, int currentStock, int defaultStock, float shopDelta) {
         return (int) Math.max(
-            itemValue * (sellMult + (shopDelta * stockDelta)) / 100,
-            shopDelta * itemValue / 100
+            itemValue * getSellMultiplier(sellMult, defaultStock, currentStock, shopDelta) / 100,
+            Math.max(30.0f * itemValue / 100, 1)
         );
     }
 

@@ -101,6 +101,22 @@ public class ShopPricesOverlay extends Overlay {
         String sellValue = ShopPricesPlugin.formatValue(sellPrice);
 
         Rectangle bounds = itemWidget.getBounds();
+
+        float currentMultiplier = ShopPricesPlugin.getSellMultiplier(
+            activeShop.sellMultiplier,
+            defaultStock,
+            itemWidget.getItemQuantity(),
+            activeShop.shopDelta
+        );
+
+        boolean atThreshold = activeShop.sellMultiplier + plugin.getConfig().priceThreshold() <= currentMultiplier;
+
+        if (plugin.getConfig().priceThresholdEnabled() && atThreshold) {
+            graphics.setColor(plugin.getConfig().thresholdOverlayColor());
+        } else {
+            graphics.setColor(plugin.getConfig().defaultOverlayColor());
+        }
+
         graphics.drawString(sellValue, bounds.x, (int) bounds.getMaxY() + PRICE_PADDING);
     }
 
@@ -154,6 +170,10 @@ public class ShopPricesOverlay extends Overlay {
 
         ItemComposition itemComposition = itemManager.getItemComposition(itemWidget.getItemId());
         Integer defaultStock = activeShop.itemStocks.get(itemComposition.getName());
+
+        if (defaultStock == null) {
+            defaultStock = 0;
+        }
 
         if (!itemComposition.isStackable() && inventorySpace > 0 && buyAmount > inventorySpace) {
             buyAmount = inventorySpace;
