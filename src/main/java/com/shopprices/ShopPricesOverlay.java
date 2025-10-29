@@ -174,7 +174,7 @@ public class ShopPricesOverlay extends Overlay {
             defaultStock = 0;
         }
 
-        if (!itemComposition.isStackable() && inventorySpace > 0 && buyAmount > inventorySpace) {
+        if (!itemComposition.isStackable() && inventorySpace > 0 && itemWidget.getItemQuantity() > inventorySpace) {
             buyAmount = inventorySpace;
         } else if (itemWidget.getItemQuantity() > 0 && buyAmount > itemWidget.getItemQuantity()) {
             buyAmount = itemWidget.getItemQuantity();
