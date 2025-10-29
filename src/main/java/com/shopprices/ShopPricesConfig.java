@@ -46,7 +46,7 @@ public interface ShopPricesConfig extends Config {
         description = "Allows you to set a threshold for when a price reaches a certain percentage."
     )
     default boolean priceThresholdEnabled() {
-        return false;
+        return true;
     }
 
     @ConfigItem(
@@ -65,7 +65,7 @@ public interface ShopPricesConfig extends Config {
         name = "Price threshold color",
         description = "Sets the threshold item value color."
     )
-    @Alpha default Color thresholdOverlayColor() {
-        return Color.RED;
+    default Color thresholdOverlayColor() {
+        return new Color(221, 69, 69);
     }
 }

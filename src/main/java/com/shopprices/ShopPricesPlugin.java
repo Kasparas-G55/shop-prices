@@ -84,6 +84,10 @@ public class ShopPricesPlugin extends Plugin {
         shopsMap.clear();
     }
 
+    public boolean priceAtThreshold(int sellMult, float currentMult) {
+        return this.config.priceThresholdEnabled() && sellMult + this.config.priceThreshold() <= currentMult;
+    }
+
     public static String formatShopKey(String shopName) {
         return String.join("_", shopName.replaceAll(SHOP_KEY_PATTERN, "").toUpperCase().split(" "));
     }

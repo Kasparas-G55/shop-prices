@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Dimension;
+import java.awt.Color;
 import java.util.Set;
 
 @Slf4j
@@ -109,9 +110,7 @@ public class ShopPricesOverlay extends Overlay {
             activeShop.shopDelta
         );
 
-        boolean atThreshold = activeShop.sellMultiplier + plugin.getConfig().priceThreshold() <= currentMultiplier;
-
-        if (plugin.getConfig().priceThresholdEnabled() && atThreshold) {
+        if (plugin.priceAtThreshold(activeShop.sellMultiplier, currentMultiplier)) {
             graphics.setColor(plugin.getConfig().thresholdOverlayColor());
         } else {
             graphics.setColor(plugin.getConfig().defaultOverlayColor());
@@ -190,9 +189,23 @@ public class ShopPricesOverlay extends Overlay {
             buyAmount
         );
 
+        float currentMultiplier = ShopPricesPlugin.getSellMultiplier(
+            activeShop.sellMultiplier,
+            defaultStock,
+            itemWidget.getItemQuantity(),
+            activeShop.shopDelta
+        );
+
+        String color = "ffffff";
+        if (plugin.priceAtThreshold(activeShop.sellMultiplier, currentMultiplier)) {
+            Color thresholdColor = plugin.getConfig().thresholdOverlayColor();
+            color = Integer.toHexString(thresholdColor.getRGB()).substring(2);
+        }
+
         Tooltip tooltip = new Tooltip(
             String.format(
-                "Sells at: %s (%d)",
+                "Sells at: <col=%s>%s</col> (%d)",
+                color,
                 ShopPricesPlugin.formatValue(totalPrice),
                 buyAmount
             )
