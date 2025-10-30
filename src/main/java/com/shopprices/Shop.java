@@ -12,7 +12,7 @@ public final class Shop {
     /** Shops default sell multiplier for every item */
     int sellMultiplier;
 
-    /** A price percentage change per shops stock surplus/deficit. */
+    /** A price percentage change per shops stock surplus/deficit based on default stock. */
     float shopDelta;
 
     /**
@@ -48,7 +48,7 @@ public final class Shop {
      * @param itemComposition       Items compositions.
      * @param multiplierThreshold   Items percentage multiplier threshold.
      * @param currentStock          Items current stock in the shop.
-     * @return                      True if threshold multiplier is greater than or equal to an items current multiplier.
+     * @return                      True when multipliers threshold is greater than or equal to an items current multiplier.
      */
     public boolean isPriceAtThreshold(ItemComposition itemComposition, int multiplierThreshold, int currentStock) {
         return this.sellMultiplier + multiplierThreshold <= this.getSellMultiplier(itemComposition, currentStock);
@@ -100,8 +100,8 @@ public final class Shop {
     public int getSellPriceTotal(ItemComposition itemComposition, int currentStock, int buyAmount) {
         int totalCost = 0;
 
-        for (int x = 0; x < buyAmount; x++) {
-            int stockDelta = currentStock - x;
+        for (int amount = 0; amount < buyAmount; amount++) {
+            int stockDelta = currentStock - amount;
             totalCost += this.getSellPrice(itemComposition, stockDelta);
         }
 
