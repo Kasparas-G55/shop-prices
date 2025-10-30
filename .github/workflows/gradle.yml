@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   gradle:
     strategy:
@@ -24,3 +28,12 @@ jobs:
 
       - name: Execute Gradle build
         run: ./gradlew build
+
+      - name: Build shadowJar
+        run: ./gradlew shadowJar
+
+      - name: Upload shadowJar
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: shop-prices-shadow
+          path: build/libs/shop-prices-*-all.jar
