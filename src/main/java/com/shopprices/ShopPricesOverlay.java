@@ -16,6 +16,7 @@ import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.tooltip.Tooltip;
 import net.runelite.client.ui.overlay.tooltip.TooltipManager;
+import net.runelite.client.util.ColorUtil;
 
 import javax.inject.Inject;
 import java.awt.Graphics2D;
@@ -32,6 +33,9 @@ public class ShopPricesOverlay extends Overlay {
         MenuAction.CC_OP,
         MenuAction.CC_OP_LOW_PRIORITY
     );
+    private static final String INVENTORY_FULL_TEXT =
+        ColorUtil.wrapWithColorTag("Warn: ", Color.YELLOW) + "Inventory is full.";
+
     private final Client client;
     private final ItemManager itemManager;
     private final TooltipManager tooltipManager;
@@ -153,10 +157,18 @@ public class ShopPricesOverlay extends Overlay {
         ItemComposition itemComposition = itemManager.getItemComposition(itemWidget.getItemId());
         int currentStock = itemWidget.getItemQuantity();
 
-        if (!itemComposition.isStackable() && inventorySpace > 0 && currentStock > inventorySpace) {
-            buyAmount = inventorySpace;
-        } else if (currentStock > 0 && buyAmount > currentStock) {
+        Tooltip tooltip;
+
+        if (inventorySpace <= 0) {
+            tooltip = new Tooltip(INVENTORY_FULL_TEXT);
+            tooltipManager.add(tooltip);
+            return;
+        }
+
+        if (itemComposition.isStackable() && buyAmount > currentStock) {
             buyAmount = currentStock;
+        } else if (buyAmount > inventorySpace) {
+            buyAmount = inventorySpace;
         }
 
         int totalPrice = activeShop.getSellPriceTotal(itemComposition, currentStock, buyAmount);
@@ -168,7 +180,7 @@ public class ShopPricesOverlay extends Overlay {
             color = Integer.toHexString(thresholdColor.getRGB()).substring(2);
         }
 
-        Tooltip tooltip = new Tooltip(
+        tooltip = new Tooltip(
             String.format(
                 "Sells at: <col=%s>%s</col> (%d)",
                 color,
