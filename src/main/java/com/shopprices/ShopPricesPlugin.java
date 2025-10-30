@@ -51,6 +51,8 @@ public class ShopPricesPlugin extends Plugin {
     @Inject
     private Gson gson;
 
+    public static final String SHOPS_RESOURCE = "shops.json";
+    public static final Type SHOP_TYPE = new TypeToken<Map<String, Shop>>(){}.getType();
     public static Map<String, Shop> shopsMap = new HashMap<>();
 
     @Provides
@@ -60,18 +62,17 @@ public class ShopPricesPlugin extends Plugin {
 
     @Override
     protected void startUp() {
-        InputStream stream = getClass().getClassLoader().getResourceAsStream("shops.json");
+        InputStream stream = getClass().getClassLoader().getResourceAsStream(SHOPS_RESOURCE);
 
         if (stream == null) {
             throw new IllegalArgumentException("Resource not found.");
         }
 
         try (InputStreamReader reader = new InputStreamReader(stream)) {
-            Type shopMapType = new TypeToken<Map<String, Shop>>(){}.getType();
-            ShopPricesPlugin.shopsMap = gson.fromJson(reader, shopMapType);
+            ShopPricesPlugin.shopsMap = gson.fromJson(reader, SHOP_TYPE);
             overlayManager.add(shopPricesOverlay);
         } catch (IOException e) {
-            log.error("Failed to read JSON file: {}", e.getMessage());
+            log.error("Failed to read JSON file \"{}\": {}", SHOPS_RESOURCE, e.getMessage());
         }
     }
 
