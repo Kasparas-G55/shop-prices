@@ -62,7 +62,7 @@ public class ShopPricesOverlay extends Overlay {
             return null;
         }
 
-        String shopName = ShopPricesPlugin.formatShopKey(frameChildren[1].getText());
+        String shopName = Shop.formatShopName(frameChildren[1].getText());
 
         for (Widget itemWidget : shopItems) {
             if (itemWidget.getItemId() == -1 || itemWidget.getName().isBlank()) {
@@ -85,32 +85,15 @@ public class ShopPricesOverlay extends Overlay {
 
     private void onDisplayOverlay(Graphics2D graphics, Shop activeShop, Widget itemWidget) {
         ItemComposition itemComposition = itemManager.getItemComposition(itemWidget.getItemId());
-        Integer defaultStock = activeShop.itemStocks.get(itemComposition.getName());
+        int currentStock = itemWidget.getItemQuantity();
+        int sellPrice = activeShop.getSellPrice(itemComposition, currentStock);
 
-        if (defaultStock == null) {
-            defaultStock = 0;
-        }
-
-        int sellPrice = ShopPricesPlugin.getSellPrice(
-            itemComposition.getPrice(),
-            activeShop.sellMultiplier,
-            itemWidget.getItemQuantity(),
-            defaultStock,
-            activeShop.shopDelta
-        );
-
-        String sellValue = ShopPricesPlugin.formatValue(sellPrice);
-
+        int multiplierThreshold = plugin.getConfig().priceThreshold();
+        String sellValue = Shop.getExactPriceValue(sellPrice);
         Rectangle bounds = itemWidget.getBounds();
 
-        float currentMultiplier = ShopPricesPlugin.getSellMultiplier(
-            activeShop.sellMultiplier,
-            defaultStock,
-            itemWidget.getItemQuantity(),
-            activeShop.shopDelta
-        );
 
-        if (plugin.priceAtThreshold(activeShop.sellMultiplier, currentMultiplier)) {
+        if (plugin.getConfig().priceThresholdEnabled() && activeShop.isPriceAtThreshold(itemComposition, multiplierThreshold, currentStock)) {
             graphics.setColor(plugin.getConfig().thresholdOverlayColor());
         } else {
             graphics.setColor(plugin.getConfig().defaultOverlayColor());
@@ -168,36 +151,19 @@ public class ShopPricesOverlay extends Overlay {
         int inventorySpace = itemContainer != null ? INVENTORY_SIZE - itemContainer.count() : 0;
 
         ItemComposition itemComposition = itemManager.getItemComposition(itemWidget.getItemId());
-        Integer defaultStock = activeShop.itemStocks.get(itemComposition.getName());
+        int currentStock = itemWidget.getItemQuantity();
 
-        if (defaultStock == null) {
-            defaultStock = 0;
-        }
-
-        if (!itemComposition.isStackable() && inventorySpace > 0 && itemWidget.getItemQuantity() > inventorySpace) {
+        if (!itemComposition.isStackable() && inventorySpace > 0 && currentStock > inventorySpace) {
             buyAmount = inventorySpace;
-        } else if (itemWidget.getItemQuantity() > 0 && buyAmount > itemWidget.getItemQuantity()) {
-            buyAmount = itemWidget.getItemQuantity();
+        } else if (currentStock > 0 && buyAmount > currentStock) {
+            buyAmount = currentStock;
         }
 
-        int totalPrice = ShopPricesPlugin.getTotalSellPrice(
-            itemComposition.getPrice(),
-            activeShop.sellMultiplier,
-            itemWidget.getItemQuantity(),
-            defaultStock,
-            activeShop.shopDelta,
-            buyAmount
-        );
-
-        float currentMultiplier = ShopPricesPlugin.getSellMultiplier(
-            activeShop.sellMultiplier,
-            defaultStock,
-            itemWidget.getItemQuantity(),
-            activeShop.shopDelta
-        );
+        int totalPrice = activeShop.getSellPriceTotal(itemComposition, currentStock, buyAmount);
+        int multiplierThreshold = plugin.getConfig().priceThreshold();
 
         String color = "ffffff";
-        if (plugin.priceAtThreshold(activeShop.sellMultiplier, currentMultiplier)) {
+        if (plugin.getConfig().priceThresholdEnabled() && activeShop.isPriceAtThreshold(itemComposition, multiplierThreshold, currentStock)) {
             Color thresholdColor = plugin.getConfig().thresholdOverlayColor();
             color = Integer.toHexString(thresholdColor.getRGB()).substring(2);
         }
@@ -206,7 +172,7 @@ public class ShopPricesOverlay extends Overlay {
             String.format(
                 "Sells at: <col=%s>%s</col> (%d)",
                 color,
-                ShopPricesPlugin.formatValue(totalPrice),
+                Shop.getExactPriceValue(totalPrice),
                 buyAmount
             )
         );
