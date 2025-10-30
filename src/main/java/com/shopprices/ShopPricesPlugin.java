@@ -53,8 +53,6 @@ public class ShopPricesPlugin extends Plugin {
     private Gson gson;
 
     public static Map<String, Shop> shopsMap = new HashMap<>();
-    public static final String SHOP_KEY_PATTERN = "[^a-zA-Z ]+";
-    public static final float MIN_SELL_MULTIPLIER = 30.0f;
 
     @Provides
     ShopPricesConfig provideConfig(ConfigManager configManager) {
@@ -82,41 +80,5 @@ public class ShopPricesPlugin extends Plugin {
     protected void shutDown() {
         overlayManager.remove(shopPricesOverlay);
         shopsMap.clear();
-    }
-
-    public boolean priceAtThreshold(int sellMult, float currentMult) {
-        return this.config.priceThresholdEnabled() && sellMult + this.config.priceThreshold() <= currentMult;
-    }
-
-    public static String formatShopKey(String shopName) {
-        return String.join("_", shopName.replaceAll(SHOP_KEY_PATTERN, "").toUpperCase().split(" "));
-    }
-
-    public static String formatValue(double value) {
-        DecimalFormat formatter = new DecimalFormat("#,###,###,###gp");
-        return formatter.format(value);
-    }
-
-    public static float getSellMultiplier(int sellMult, int defaultStock, int currentStock, float shopDelta) {
-        int stockDelta = defaultStock - currentStock;
-        return sellMult + (shopDelta * stockDelta);
-    }
-
-    public static int getSellPrice(int itemValue, int sellMult, int currentStock, int defaultStock, float shopDelta) {
-        return (int) Math.max(
-            itemValue * getSellMultiplier(sellMult, defaultStock, currentStock, shopDelta) / 100,
-            Math.max(MIN_SELL_MULTIPLIER * itemValue / 100, 1)
-        );
-    }
-
-    public static int getTotalSellPrice(int itemValue, int sellMult, int itemStock, int defaultStock, float shopDelta, int buyAmount) {
-        int totalCost = 0;
-
-        for (int x = 0; x < buyAmount; x++) {
-            int currentStock = itemStock - x;
-            totalCost += getSellPrice(itemValue, sellMult, currentStock, defaultStock, shopDelta);
-        }
-
-        return totalCost;
     }
 }
