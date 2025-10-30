@@ -174,19 +174,17 @@ public class ShopPricesOverlay extends Overlay {
         int totalPrice = activeShop.getSellPriceTotal(itemComposition, currentStock, buyAmount);
         int multiplierThreshold = plugin.getConfig().priceThreshold();
 
-        String color = "ffffff";
+        Color priceColor;
         if (plugin.getConfig().priceThresholdEnabled() && activeShop.isPriceAtThreshold(itemComposition, multiplierThreshold, currentStock)) {
-            Color thresholdColor = plugin.getConfig().thresholdOverlayColor();
-            color = Integer.toHexString(thresholdColor.getRGB()).substring(2);
+            priceColor = plugin.getConfig().thresholdOverlayColor();
+        } else {
+            priceColor = Color.WHITE;
         }
 
+        String priceText = ColorUtil.wrapWithColorTag(totalPrice + " gp", priceColor);
+
         tooltip = new Tooltip(
-            String.format(
-                "Sells at: <col=%s>%s</col> (%d)",
-                color,
-                Shop.getExactPriceValue(totalPrice),
-                buyAmount
-            )
+            String.format("Sells at: %s (%d)", priceText, buyAmount)
         );
 
         tooltipManager.add(tooltip);
