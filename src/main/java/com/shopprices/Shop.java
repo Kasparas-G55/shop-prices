@@ -1,6 +1,7 @@
 package com.shopprices;
 
 import net.runelite.api.ItemComposition;
+import net.runelite.client.util.QuantityFormatter;
 
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -29,6 +30,17 @@ public final class Shop {
      */
     public static String formatShopName(String shopName) {
         return String.join("_", shopName.replaceAll(SHOP_KEY_PATTERN, "").toUpperCase().split(" "));
+    }
+
+    /**
+     * Gets RuneScape's precise decimal currency stack value.
+     *
+     * @param priceValue Items sell price value.
+     * @see QuantityFormatter#quantityToRSDecimalStack(int, boolean)
+     *
+     */
+    public static String getPriceValue(int priceValue) {
+        return QuantityFormatter.quantityToRSDecimalStack(priceValue, true) + " gp";
     }
 
     /**

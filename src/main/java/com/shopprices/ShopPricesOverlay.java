@@ -89,7 +89,7 @@ public class ShopPricesOverlay extends Overlay {
         int sellPrice = activeShop.getSellPrice(itemComposition, currentStock);
 
         int multiplierThreshold = plugin.getConfig().priceThreshold();
-        String sellValue = Shop.getExactPriceValue(sellPrice);
+        String sellValue = Shop.getPriceValue(sellPrice);
         Rectangle bounds = itemWidget.getBounds();
 
 
