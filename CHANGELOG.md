@@ -1,9 +1,37 @@
 # Changelog
 
 
+## v1.1.1
+
+[compare changes](https://github.com/Kasparas-G55/shop-prices/compare/b029dec4de9b66f7af10823f4b093981c8c53580...a68d248375dcf9eac3d31061e4409fb5ffb981ea)
+
+### 🩹 Fixes
+
+- Format shop overlay price values ([#6](https://github.com/Kasparas-G55/shop-prices/pull/6))
+- Buy amount showing max inventory space for unstackable items ([#7](https://github.com/Kasparas-G55/shop-prices/pull/7))
+
+### 💅 Refactors
+
+- Future proofing code ([#4](https://github.com/Kasparas-G55/shop-prices/pull/4))
+- Utilize ColorUtil class ([#8](https://github.com/Kasparas-G55/shop-prices/pull/8))
+- Constants for resource name and type ([#11](https://github.com/Kasparas-G55/shop-prices/pull/11))
+
+### ✅ Tests
+
+- Basic JsonResourceTest class ([#10](https://github.com/Kasparas-G55/shop-prices/pull/10))
+
+### 🤖 CI
+
+- Setup gradle build ([#9](https://github.com/Kasparas-G55/shop-prices/pull/9))
+
+### ❤️ Contributors
+
+- Kasparas Galdikas ([@Kasparas-G55](https://github.com/Kasparas-G55))
+
+
 ## v1.1.0
 
-[compare changes](https://github.com/Kasparas-G55/shop-prices/compare/a524175...main)
+[compare changes](https://github.com/Kasparas-G55/shop-prices/compare/a524175...13b30be)
 
 ### 🚀 Enhancements
 
