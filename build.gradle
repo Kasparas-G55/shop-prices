@@ -16,14 +16,18 @@ repositories {
 def runeLiteVersion = 'latest.release'
 
 dependencies {
+    def lombokVersion = '1.18.30'
+	compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+	annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+
 	compileOnly group: 'net.runelite', name:'client', version: runeLiteVersion
-
-	compileOnly 'org.projectlombok:lombok:1.18.30'
-	annotationProcessor 'org.projectlombok:lombok:1.18.30'
-
-	testImplementation 'junit:junit:4.12'
 	testImplementation group: 'net.runelite', name:'client', version: runeLiteVersion
 	testImplementation group: 'net.runelite', name:'jshell', version: runeLiteVersion
+
+    def junitVersion = '5.5.2'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitVersion
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
 }
 
 group = 'com.shopprices'
@@ -32,6 +36,12 @@ version = '1.1.0'
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = 'UTF-8'
 	options.release.set(11)
+}
+
+tasks.test {
+    useJUnitPlatform {
+        excludeTags("generator")
+    }
 }
 
 tasks.register('shadowJar', Jar) {
