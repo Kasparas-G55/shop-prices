@@ -75,6 +75,10 @@ public class ShopPricesOverlay extends Overlay {
 
             Shop activeShop = ShopPricesPlugin.shopsMap.get(shopName);
 
+            if (activeShop == null) {
+                return null;
+            }
+
             if (plugin.getConfig().displayOverlay()) {
                 onDisplayOverlay(graphics, activeShop, itemWidget);
             }
@@ -95,7 +99,6 @@ public class ShopPricesOverlay extends Overlay {
         int multiplierThreshold = plugin.getConfig().priceThreshold();
         String sellValue = Shop.getPriceValue(sellPrice);
         Rectangle bounds = itemWidget.getBounds();
-
 
         if (plugin.getConfig().priceThresholdEnabled() && activeShop.isPriceAtThreshold(itemComposition, multiplierThreshold, currentStock)) {
             graphics.setColor(plugin.getConfig().thresholdOverlayColor());
