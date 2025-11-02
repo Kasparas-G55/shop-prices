@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v1.1.2
+
+[compare changes](https://github.com/Kasparas-G55/shop-prices/compare/a3516db...63e3b4b)
+
+### 🩹 Fixes
+
+- Skip shops not in json resource ([63e3b4b](https://github.com/Kasparas-G55/shop-prices/commit/63e3b4b))
+
+### ❤️ Contributors
+
+- Kasparas-G55 ([@Kasparas-G55](https://github.com/Kasparas-G55))
+
+
 ## v1.1.1
 
 [compare changes](https://github.com/Kasparas-G55/shop-prices/compare/b029dec4de9b66f7af10823f4b093981c8c53580...a68d248375dcf9eac3d31061e4409fb5ffb981ea)
