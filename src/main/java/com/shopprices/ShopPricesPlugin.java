@@ -91,11 +91,7 @@ public class ShopPricesPlugin extends Plugin {
     protected void onScriptPreFired(ScriptPreFired event) {
         Widget items = client.getWidget(InterfaceID.Shopmain.ITEMS);
 
-        if (items == null) {
-            return;
-        }
-
-        if (event.getScriptId() != ScriptID.UPDATE_SCROLLBAR) {
+        if (items == null || event.getScriptId() != ScriptID.UPDATE_SCROLLBAR) {
             return;
         }
 
