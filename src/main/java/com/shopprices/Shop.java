@@ -18,7 +18,7 @@ public final class Shop {
 
     /**
      * A map of items that contains their default shop stock.
-     * Items stock defaulted to 0 on null.
+     * Items stock defaulted to {@code 0} on {@code null}.
      */
     Map<String, Integer> itemStocks;
 
@@ -60,7 +60,7 @@ public final class Shop {
      * @param itemComposition       Items compositions.
      * @param multiplierThreshold   Items percentage multiplier threshold.
      * @param currentStock          Items current stock in the shop.
-     * @return                      True when multipliers threshold is greater than or equal to an items current multiplier.
+     * @return                      {@code True} if, multipliers threshold is greater than or equal to an items current multiplier.
      */
     public boolean isPriceAtThreshold(ItemComposition itemComposition, int multiplierThreshold, int currentStock) {
         return this.sellMultiplier + multiplierThreshold <= this.getSellMultiplier(itemComposition, currentStock);
