@@ -6,7 +6,12 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.ScriptID;
+import net.runelite.api.events.ScriptPreFired;
+import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
+import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -20,7 +25,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-
 
 @Slf4j
 @PluginDescriptor(
@@ -51,8 +55,9 @@ public class ShopPricesPlugin extends Plugin {
     @Inject
     private Gson gson;
 
-    public static final String SHOPS_RESOURCE = "shops.json";
-    public static final Type SHOP_TYPE = new TypeToken<Map<String, Shop>>(){}.getType();
+    private static final int SHOP_SCROLL_HEIGHT = 235;
+    private static final String SHOPS_RESOURCE = "shops.json";
+    private static final Type SHOP_TYPE = new TypeToken<Map<String, Shop>>(){}.getType();
     public static Map<String, Shop> shopsMap = new HashMap<>();
 
     @Provides
@@ -80,5 +85,25 @@ public class ShopPricesPlugin extends Plugin {
     protected void shutDown() {
         overlayManager.remove(shopPricesOverlay);
         shopsMap.clear();
+    }
+
+    @Subscribe
+    protected void onScriptPreFired(ScriptPreFired event) {
+        Widget items = client.getWidget(InterfaceID.Shopmain.ITEMS);
+
+        if (items == null || event.getScriptId() != ScriptID.UPDATE_SCROLLBAR) {
+            return;
+        }
+
+        Widget scrollbar = client.getWidget(InterfaceID.Shopmain.SCROLLBAR);
+
+        if (scrollbar != null && scrollbar.isHidden()) {
+            items.setScrollHeight(0);
+            items.revalidateScroll();
+            return;
+        }
+
+        items.setScrollHeight(SHOP_SCROLL_HEIGHT);
+        items.revalidateScroll();
     }
 }
