@@ -53,27 +53,28 @@ public class ShopPricesOverlay extends Overlay {
 
     @Override
     public Dimension render(Graphics2D graphics) {
+        if (plugin.shopName == null) {
+            return null;
+        }
+
         Widget shopWidget = client.getWidget(InterfaceID.Shopmain.ITEMS);
-        Widget frameWidget = client.getWidget(InterfaceID.Shopmain.FRAME);
-        if (shopWidget == null || frameWidget == null) {
+
+        if (shopWidget == null) {
             return null;
         }
 
         Widget[] shopItems = shopWidget.getDynamicChildren();
-        Widget[] frameChildren = frameWidget.getDynamicChildren();
 
-        if (shopItems == null || frameChildren == null) {
+        if (shopItems == null) {
             return null;
         }
-
-        String shopName = Shop.formatShopName(frameChildren[1].getText());
 
         for (Widget itemWidget : shopItems) {
             if (itemWidget.getItemId() == -1 || itemWidget.getName().isBlank()) {
                 continue;
             }
 
-            Shop activeShop = ShopPricesPlugin.shopsMap.get(shopName);
+            Shop activeShop = plugin.shopsMap.get(plugin.shopName);
 
             if (activeShop == null) {
                 return null;

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ScriptID;
 import net.runelite.api.events.ScriptPreFired;
+import net.runelite.api.events.WidgetClosed;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.config.ConfigManager;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,9 +58,11 @@ public class ShopPricesPlugin extends Plugin {
     private Gson gson;
 
     private static final int SHOP_SCROLL_HEIGHT = 235;
+    private static final int SHOP_MAIN_INIT = 1074;
     private static final String SHOPS_RESOURCE = "shops.json";
     private static final Type SHOP_TYPE = new TypeToken<Map<String, Shop>>(){}.getType();
-    public static Map<String, Shop> shopsMap = new HashMap<>();
+    public Map<String, Shop> shopsMap = new HashMap<>();
+    public String shopName;
 
     @Provides
     ShopPricesConfig provideConfig(ConfigManager configManager) {
@@ -74,8 +78,8 @@ public class ShopPricesPlugin extends Plugin {
         }
 
         try (InputStreamReader reader = new InputStreamReader(stream)) {
-            ShopPricesPlugin.shopsMap = gson.fromJson(reader, SHOP_TYPE);
-            overlayManager.add(shopPricesOverlay);
+            this.shopsMap = gson.fromJson(reader, SHOP_TYPE);
+            this.overlayManager.add(shopPricesOverlay);
         } catch (IOException e) {
             log.error("Failed to read JSON file \"{}\": {}", SHOPS_RESOURCE, e.getMessage());
         }
@@ -83,12 +87,26 @@ public class ShopPricesPlugin extends Plugin {
 
     @Override
     protected void shutDown() {
-        overlayManager.remove(shopPricesOverlay);
-        shopsMap.clear();
+        this.overlayManager.remove(shopPricesOverlay);
+        this.shopsMap.clear();
+    }
+
+    @Subscribe
+    protected void onWidgetClosed(WidgetClosed event) {
+        if (event.getGroupId() == InterfaceID.SHOPMAIN) {
+            this.shopName = null;
+        }
     }
 
     @Subscribe
     protected void onScriptPreFired(ScriptPreFired event) {
+        if (event.getScriptId() == SHOP_MAIN_INIT) {
+           // 1074
+           // [clientscript,shop_main_init](inv $inv0, string $string0, obj $obj1, int $int2, boolean $boolean3)
+            String name = (String) event.getScriptEvent().getArguments()[2];
+            this.shopName = Shop.formatShopName(name);
+        }
+
         Widget items = client.getWidget(InterfaceID.Shopmain.ITEMS);
 
         if (items == null || event.getScriptId() != ScriptID.UPDATE_SCROLLBAR) {
