@@ -9,11 +9,9 @@ import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
-import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
-import net.runelite.client.ui.overlay.Overlay;
-import net.runelite.client.ui.overlay.OverlayLayer;
-import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.WidgetItemOverlay;
 import net.runelite.client.ui.overlay.tooltip.Tooltip;
 import net.runelite.client.ui.overlay.tooltip.TooltipManager;
 import net.runelite.client.util.ColorUtil;
@@ -21,13 +19,13 @@ import net.runelite.client.util.ColorUtil;
 import javax.inject.Inject;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Dimension;
 import java.awt.Color;
 import java.util.Set;
 
 @Slf4j
-public class ShopPricesOverlay extends Overlay {
+public class ShopPricesOverlay extends WidgetItemOverlay {
     private static final int PRICE_PADDING = 10;
+    private static final int WIDTH_CLIP_PADDING = 10;
     private static final int INVENTORY_SIZE = 28;
     private static final Set<MenuAction> SHOP_WIDGET_ACTIONS = ImmutableSet.of(
         MenuAction.CC_OP,
@@ -43,63 +41,42 @@ public class ShopPricesOverlay extends Overlay {
 
     @Inject
     public ShopPricesOverlay(ShopPricesPlugin plugin, Client client, ItemManager itemManager, TooltipManager tooltipManager) {
-        setPosition(OverlayPosition.DYNAMIC);
-        setLayer(OverlayLayer.ABOVE_WIDGETS);
+        drawAfterLayer(InterfaceID.Shopmain.ITEMS);
         this.plugin = plugin;
         this.client = client;
-        this.itemManager = itemManager;
         this.tooltipManager = tooltipManager;
+        this.itemManager = itemManager;
     }
 
     @Override
-    public Dimension render(Graphics2D graphics) {
+    public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem itemWidget) {
         if (plugin.shopName == null) {
-            return null;
+            return;
         }
 
-        Widget shopWidget = client.getWidget(InterfaceID.Shopmain.ITEMS);
+        Shop activeShop = plugin.shopsMap.get(plugin.shopName);
 
-        if (shopWidget == null) {
-            return null;
+        if (activeShop == null) {
+            return;
         }
 
-        Widget[] shopItems = shopWidget.getDynamicChildren();
-
-        if (shopItems == null) {
-            return null;
+        if (plugin.getConfig().displayOverlay()) {
+            onDisplayOverlay(graphics, activeShop, itemWidget);
         }
 
-        for (Widget itemWidget : shopItems) {
-            if (itemWidget.getItemId() == -1 || itemWidget.getName().isBlank()) {
-                continue;
-            }
-
-            Shop activeShop = plugin.shopsMap.get(plugin.shopName);
-
-            if (activeShop == null) {
-                return null;
-            }
-
-            if (plugin.getConfig().displayOverlay()) {
-                onDisplayOverlay(graphics, activeShop, itemWidget);
-            }
-
-            if (plugin.getConfig().displayTooltip()) {
-                onDisplayTooltip(activeShop, itemWidget);
-            }
+        if (plugin.getConfig().displayTooltip()) {
+            onDisplayTooltip(activeShop, itemWidget);
         }
-
-        return null;
     }
 
-    private void onDisplayOverlay(Graphics2D graphics, Shop activeShop, Widget itemWidget) {
-        ItemComposition itemComposition = itemManager.getItemComposition(itemWidget.getItemId());
-        int currentStock = itemWidget.getItemQuantity();
+    private void onDisplayOverlay(Graphics2D graphics, Shop activeShop, WidgetItem itemWidget) {
+        ItemComposition itemComposition = itemManager.getItemComposition(itemWidget.getId());
+        int currentStock = itemWidget.getQuantity();
         int sellPrice = activeShop.getSellPrice(itemComposition, currentStock);
 
         int multiplierThreshold = plugin.getConfig().priceThreshold();
         String sellValue = Shop.getPriceValue(sellPrice);
-        Rectangle bounds = itemWidget.getBounds();
+        Rectangle bounds = itemWidget.getCanvasBounds();
 
         if (plugin.getConfig().priceThresholdEnabled() && activeShop.isPriceAtThreshold(itemComposition, multiplierThreshold, currentStock)) {
             graphics.setColor(plugin.getConfig().thresholdOverlayColor());
@@ -107,10 +84,15 @@ public class ShopPricesOverlay extends Overlay {
             graphics.setColor(plugin.getConfig().defaultOverlayColor());
         }
 
+        Rectangle parentBounds = itemWidget.getWidget().getParent().getBounds();
+
+        parentBounds.setSize(parentBounds.width + WIDTH_CLIP_PADDING, parentBounds.height);
+
+        graphics.setClip(parentBounds);
         graphics.drawString(sellValue, bounds.x, (int) bounds.getMaxY() + PRICE_PADDING);
     }
 
-    private void onDisplayTooltip(Shop activeShop, Widget itemWidget) {
+    private void onDisplayTooltip(Shop activeShop, WidgetItem itemWidget) {
         MenuEntry[] menuEntries = client.getMenu().getMenuEntries();
         int lastEntry = menuEntries.length - 1;
 
@@ -127,7 +109,7 @@ public class ShopPricesOverlay extends Overlay {
         String option = menuEntry.getOption();
         int itemId = menuEntry.getItemId();
 
-        if (itemId != itemWidget.getItemId()) {
+        if (itemId != itemWidget.getId()) {
             return;
         }
 
@@ -158,8 +140,8 @@ public class ShopPricesOverlay extends Overlay {
         ItemContainer itemContainer = client.getItemContainer(InventoryID.INV);
         int inventorySpace = itemContainer != null ? INVENTORY_SIZE - itemContainer.count() : 0;
 
-        ItemComposition itemComposition = itemManager.getItemComposition(itemWidget.getItemId());
-        int currentStock = itemWidget.getItemQuantity();
+        ItemComposition itemComposition = itemManager.getItemComposition(itemId);
+        int currentStock = itemWidget.getQuantity();
 
         Tooltip tooltip;
 
