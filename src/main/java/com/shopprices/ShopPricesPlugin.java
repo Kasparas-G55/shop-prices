@@ -62,9 +62,8 @@ public class ShopPricesPlugin extends Plugin {
     private static final int SHOP_QUANTITY_VARP_ID = 1022;
     private static final String SHOPS_RESOURCE = "shops.json";
     private static final Type SHOP_TYPE = new TypeToken<Map<String, Shop>>(){}.getType();
-    public ShopQuantity quantityOption = ShopQuantity.VALUE;
     public Map<String, Shop> shopsMap = new HashMap<>();
-    public String shopName;
+    public Shop activeShop = null;
 
     @Provides
     ShopPricesConfig provideConfig(ConfigManager configManager) {
@@ -96,8 +95,8 @@ public class ShopPricesPlugin extends Plugin {
     @Subscribe
     protected void onWidgetClosed(WidgetClosed event) {
         if (event.getGroupId() == InterfaceID.SHOPMAIN) {
-            this.shopName = null;
-            this.quantityOption = ShopQuantity.VALUE;
+            log.debug("Closing shop \"{}\".", this.activeShop);
+            this.activeShop = null;
         }
     }
 
@@ -106,23 +105,25 @@ public class ShopPricesPlugin extends Plugin {
         if (event.getScriptId() == SHOP_MAIN_INIT) {
            // [clientscript,shop_main_init](inv $inv0, string $string0, obj $obj1, int $int2, boolean $boolean3)
             String name = (String) event.getScriptEvent().getArguments()[2];
-            this.shopName = Shop.formatShopName(name);
-            log.debug("Opened shop \"{}\" ({})", name, this.shopName);
+            String shopKey = Shop.formatShopName(name);
+
+            this.activeShop = shopsMap.get(shopKey);
+            log.debug("Opened shop \"{}\". ({})", name, shopKey);
         }
 
-        Widget items = client.getWidget(InterfaceID.Shopmain.ITEMS);
+        Widget itemsWidget = client.getWidget(InterfaceID.Shopmain.ITEMS);
 
-        if (items != null && event.getScriptId() == ScriptID.UPDATE_SCROLLBAR) {
+        if (itemsWidget != null && event.getScriptId() == ScriptID.UPDATE_SCROLLBAR) {
             Widget scrollbar = client.getWidget(InterfaceID.Shopmain.SCROLLBAR);
 
             if (scrollbar != null && scrollbar.isHidden()) {
-                items.setScrollHeight(0);
-                items.revalidateScroll();
+                itemsWidget.setScrollHeight(0);
+                itemsWidget.revalidateScroll();
                 return;
             }
 
-            items.setScrollHeight(SHOP_SCROLL_HEIGHT);
-            items.revalidateScroll();
+            itemsWidget.setScrollHeight(SHOP_SCROLL_HEIGHT);
+            itemsWidget.revalidateScroll();
         }
     }
 
@@ -130,8 +131,8 @@ public class ShopPricesPlugin extends Plugin {
     protected void onVarbitChanged(VarbitChanged event) {
         // Varbit ID: 6348
         if (event.getVarpId() == SHOP_QUANTITY_VARP_ID) {
-            this.quantityOption = ShopQuantity.getById(event.getValue());
-            log.debug("Shop quantity option set to \"{}\" ({})", event.getValue(), quantityOption.getOption());
+            this.activeShop.quantityOption = ShopQuantity.getById(event.getValue());
+            log.debug("Shop quantity option set to \"{}\". ({})", event.getValue(), this.activeShop.quantityOption.getOption());
         }
     }
 }

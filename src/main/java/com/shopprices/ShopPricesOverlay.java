@@ -50,22 +50,16 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
 
     @Override
     public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem itemWidget) {
-        if (plugin.shopName == null) {
-            return;
-        }
-
-        Shop activeShop = plugin.shopsMap.get(plugin.shopName);
-
-        if (activeShop == null) {
+        if (plugin.activeShop == null) {
             return;
         }
 
         if (plugin.getConfig().displayOverlay()) {
-            onDisplayOverlay(graphics, activeShop, itemWidget);
+            onDisplayOverlay(graphics, plugin.activeShop, itemWidget);
         }
 
         if (plugin.getConfig().displayTooltip()) {
-            onDisplayTooltip(activeShop, itemWidget);
+            onDisplayTooltip(plugin.activeShop, itemWidget);
         }
     }
 
@@ -107,7 +101,7 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
         MenuEntry menuEntry = menuEntries[lastEntry];
         MenuAction type = menuEntry.getType();
         int itemId = menuEntry.getItemId();
-        int buyAmount = plugin.quantityOption.getAmount();
+        int buyAmount = plugin.activeShop.quantityOption.getAmount();
 
         if (itemId != itemWidget.getId()) {
             return;

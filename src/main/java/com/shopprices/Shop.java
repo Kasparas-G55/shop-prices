@@ -16,11 +16,14 @@ public final class Shop {
     /** A price percentage change per shops stock surplus/deficit based on default stock. */
     float shopDelta;
 
+    /** Shops currently set quantity option, default is {@code Value}. */
+    ShopQuantity quantityOption = ShopQuantity.VALUE;
+
     /**
      * A map of items that contains their default shop stock.
      * Items stock defaulted to {@code 0} on {@code null}.
      */
-    Map<String, Integer> itemStocks;
+     Map<String, Integer> itemStocks;
 
     /**
      * Gets the map key by formatting the shops name.
