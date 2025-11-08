@@ -32,7 +32,13 @@ public final class Shop {
      * @return         Shop key for accessing a structured map.
      */
     public static String formatShopName(String shopName) {
-        return String.join("_", shopName.replaceAll(SHOP_KEY_PATTERN, "").toUpperCase().split(" "));
+        return String.join(
+            "_",
+            shopName.replaceAll(SHOP_KEY_PATTERN, "")
+                .toUpperCase()
+                .trim()
+                .split("\\s+")
+        );
     }
 
     /**
