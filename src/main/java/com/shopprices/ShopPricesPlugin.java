@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.ScriptID;
 import net.runelite.api.events.ScriptPreFired;
+import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetClosed;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
@@ -58,8 +59,10 @@ public class ShopPricesPlugin extends Plugin {
 
     private static final int SHOP_SCROLL_HEIGHT = 235;
     private static final int SHOP_MAIN_INIT = 1074;
+    private static final int SHOP_QUANTITY_VARP_ID = 1022;
     private static final String SHOPS_RESOURCE = "shops.json";
     private static final Type SHOP_TYPE = new TypeToken<Map<String, Shop>>(){}.getType();
+    public ShopQuantity quantityOption = ShopQuantity.VALUE;
     public Map<String, Shop> shopsMap = new HashMap<>();
     public String shopName;
 
@@ -94,6 +97,7 @@ public class ShopPricesPlugin extends Plugin {
     protected void onWidgetClosed(WidgetClosed event) {
         if (event.getGroupId() == InterfaceID.SHOPMAIN) {
             this.shopName = null;
+            this.quantityOption = ShopQuantity.VALUE;
         }
     }
 
@@ -103,23 +107,31 @@ public class ShopPricesPlugin extends Plugin {
            // [clientscript,shop_main_init](inv $inv0, string $string0, obj $obj1, int $int2, boolean $boolean3)
             String name = (String) event.getScriptEvent().getArguments()[2];
             this.shopName = Shop.formatShopName(name);
+            log.debug("Opened shop \"{}\" ({})", name, this.shopName);
         }
 
         Widget items = client.getWidget(InterfaceID.Shopmain.ITEMS);
 
-        if (items == null || event.getScriptId() != ScriptID.UPDATE_SCROLLBAR) {
-            return;
-        }
+        if (items != null && event.getScriptId() == ScriptID.UPDATE_SCROLLBAR) {
+            Widget scrollbar = client.getWidget(InterfaceID.Shopmain.SCROLLBAR);
 
-        Widget scrollbar = client.getWidget(InterfaceID.Shopmain.SCROLLBAR);
+            if (scrollbar != null && scrollbar.isHidden()) {
+                items.setScrollHeight(0);
+                items.revalidateScroll();
+                return;
+            }
 
-        if (scrollbar != null && scrollbar.isHidden()) {
-            items.setScrollHeight(0);
+            items.setScrollHeight(SHOP_SCROLL_HEIGHT);
             items.revalidateScroll();
-            return;
         }
+    }
 
-        items.setScrollHeight(SHOP_SCROLL_HEIGHT);
-        items.revalidateScroll();
+    @Subscribe
+    protected void onVarbitChanged(VarbitChanged event) {
+        // Varbit ID: 6348
+        if (event.getVarpId() == SHOP_QUANTITY_VARP_ID) {
+            this.quantityOption = ShopQuantity.getById(event.getValue());
+            log.debug("Shop quantity option set to \"{}\" ({})", event.getValue(), quantityOption.getOption());
+        }
     }
 }

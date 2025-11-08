@@ -106,8 +106,8 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
 
         MenuEntry menuEntry = menuEntries[lastEntry];
         MenuAction type = menuEntry.getType();
-        String option = menuEntry.getOption();
         int itemId = menuEntry.getItemId();
+        int buyAmount = plugin.quantityOption.getAmount();
 
         if (itemId != itemWidget.getId()) {
             return;
@@ -117,31 +117,8 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
             return;
         }
 
-        int buyAmount;
-
-        switch (option) {
-            case "Buy 50":
-                buyAmount = 50;
-                break;
-            case "Buy 10":
-                buyAmount = 10;
-                break;
-            case "Buy 5":
-                buyAmount = 5;
-                break;
-            case "Buy 1":
-            case "Value":
-                buyAmount = 1;
-                break;
-            default:
-                return;
-        }
-
         ItemContainer itemContainer = client.getItemContainer(InventoryID.INV);
         int inventorySpace = itemContainer != null ? INVENTORY_SIZE - itemContainer.count() : 0;
-
-        ItemComposition itemComposition = itemManager.getItemComposition(itemId);
-        int currentStock = itemWidget.getQuantity();
 
         Tooltip tooltip;
 
@@ -150,6 +127,9 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
             tooltipManager.add(tooltip);
             return;
         }
+
+        ItemComposition itemComposition = itemManager.getItemComposition(itemId);
+        int currentStock = itemWidget.getQuantity();
 
         if (itemComposition.isStackable() && buyAmount > currentStock) {
             buyAmount = currentStock;
