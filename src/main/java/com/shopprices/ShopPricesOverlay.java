@@ -141,7 +141,7 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
             priceColor = Color.WHITE;
         }
 
-        String priceText = ColorUtil.wrapWithColorTag(totalPrice + " gp", priceColor);
+        String priceText = ColorUtil.wrapWithColorTag(Shop.getExactPriceValue(totalPrice) + " gp", priceColor);
 
         tooltip = new Tooltip(
             String.format("Sells at: %s (%d)", priceText, buyAmount)
