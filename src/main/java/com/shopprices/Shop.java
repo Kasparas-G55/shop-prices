@@ -1,12 +1,20 @@
 package com.shopprices;
 
+import com.google.common.collect.ImmutableSet;
 import net.runelite.api.ItemComposition;
+import net.runelite.api.MenuAction;
 import net.runelite.client.util.QuantityFormatter;
 
 import java.text.DecimalFormat;
 import java.util.Map;
+import java.util.Set;
 
 public final class Shop {
+    public static final Set<String> MENU_OPTIONS = ImmutableSet.of("Value", "Buy 50", "Buy 10", "Buy 5", "Buy 1");
+    public static final Set<MenuAction> MENU_ACTIONS = ImmutableSet.of(
+        MenuAction.CC_OP,
+        MenuAction.CC_OP_LOW_PRIORITY
+    );
     public static final String SHOP_KEY_PATTERN = "[^a-zA-Z ]+";
     public static final float MIN_SELL_MULTIPLIER = 30.0f;
 
@@ -64,7 +72,7 @@ public final class Shop {
     }
 
     /**
-     * Gets the items selling multiplier based on its current stock.
+     * Checks if multiplier is at/past price threshold.
      *
      * @param itemComposition       Items compositions.
      * @param multiplierThreshold   Items percentage multiplier threshold.
@@ -73,6 +81,18 @@ public final class Shop {
      */
     public boolean isPriceAtThreshold(ItemComposition itemComposition, int multiplierThreshold, int currentStock) {
         return this.sellMultiplier + multiplierThreshold <= this.getSellMultiplier(itemComposition, currentStock);
+    }
+
+    /**
+     * Checks if quantity is at/past price threshold.
+     *
+     * @param itemComposition       Items compositions.
+     * @param multiplierThreshold   Items percentage multiplier threshold.
+     * @param currentStock          Items current stock in the shop.
+     * @return                      {@code True} if, current quantity option will pass or is at price threshold.
+     */
+    public boolean isQuantityAtThreshold(ItemComposition itemComposition, int multiplierThreshold, int currentStock) {
+        return isPriceAtThreshold(itemComposition, multiplierThreshold, currentStock - this.quantityOption.getAmount());
     }
 
     /**

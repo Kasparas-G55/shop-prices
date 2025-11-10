@@ -27,12 +27,10 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
     private static final int PRICE_PADDING = 10;
     private static final int WIDTH_CLIP_PADDING = 10;
     private static final int INVENTORY_SIZE = 28;
-    private static final Set<MenuAction> SHOP_WIDGET_ACTIONS = ImmutableSet.of(
-        MenuAction.CC_OP,
-        MenuAction.CC_OP_LOW_PRIORITY
-    );
-    private static final String INVENTORY_FULL_TEXT =
-        ColorUtil.wrapWithColorTag("Warn: ", Color.YELLOW) + "Inventory is full.";
+    private static final String WARN_TAG = ColorUtil.wrapWithColorTag("Warn: ", Color.YELLOW);
+    private static final String INVENTORY_FULL_TEXT = WARN_TAG + "Inventory is full.";
+    private static final String THRESHOLD_BLOCK_TEXT = WARN_TAG + "Blocking - at threshold.";
+    private static final String QUANTITY_BLOCK_TEXT = WARN_TAG + "Blocking - quantity will pass threshold.";
 
     private final Client client;
     private final ItemManager itemManager;
@@ -100,14 +98,18 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
 
         MenuEntry menuEntry = menuEntries[lastEntry];
         MenuAction type = menuEntry.getType();
+        String option = menuEntry.getOption();
         int itemId = menuEntry.getItemId();
-        int buyAmount = plugin.activeShop.quantityOption.getAmount();
 
         if (itemId != itemWidget.getId()) {
             return;
         }
 
-        if (!SHOP_WIDGET_ACTIONS.contains(type)) {
+        if (!Shop.MENU_ACTIONS.contains(type)) {
+            return;
+        }
+
+        if (!Shop.MENU_OPTIONS.contains(option)) {
             return;
         }
 
@@ -124,21 +126,37 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
 
         ItemComposition itemComposition = itemManager.getItemComposition(itemId);
         int currentStock = itemWidget.getQuantity();
+        int multiplierThreshold = plugin.getConfig().priceThreshold();
+        boolean atThreshold = activeShop.isPriceAtThreshold(itemComposition, multiplierThreshold, currentStock);
+
+        if (plugin.getConfig().blockOnThreshold()) {
+            if (atThreshold) {
+                tooltip = new Tooltip(THRESHOLD_BLOCK_TEXT);
+                tooltipManager.add(tooltip);
+                return;
+            }
+
+            if (plugin.getConfig().blockCheckQuantity() && activeShop.isQuantityAtThreshold(itemComposition, multiplierThreshold, currentStock)) {
+                tooltip = new Tooltip(QUANTITY_BLOCK_TEXT);
+                tooltipManager.add(tooltip);
+                return;
+            }
+        }
+
+        Color priceColor;
+        if (plugin.getConfig().priceThresholdEnabled() && atThreshold) {
+            priceColor = plugin.getConfig().thresholdOverlayColor();
+        } else {
+            priceColor = Color.WHITE;
+        }
+
+        int buyAmount = plugin.activeShop.quantityOption.getAmount();
+        int totalPrice = activeShop.getSellPriceTotal(itemComposition, currentStock, buyAmount);
 
         if (itemComposition.isStackable() && buyAmount > currentStock) {
             buyAmount = currentStock;
         } else if (buyAmount > inventorySpace) {
             buyAmount = inventorySpace;
-        }
-
-        int totalPrice = activeShop.getSellPriceTotal(itemComposition, currentStock, buyAmount);
-        int multiplierThreshold = plugin.getConfig().priceThreshold();
-
-        Color priceColor;
-        if (plugin.getConfig().priceThresholdEnabled() && activeShop.isPriceAtThreshold(itemComposition, multiplierThreshold, currentStock)) {
-            priceColor = plugin.getConfig().thresholdOverlayColor();
-        } else {
-            priceColor = Color.WHITE;
         }
 
         String priceText = ColorUtil.wrapWithColorTag(Shop.getExactPriceValue(totalPrice) + " gp", priceColor);

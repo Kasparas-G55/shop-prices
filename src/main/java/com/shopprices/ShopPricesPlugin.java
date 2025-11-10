@@ -6,7 +6,9 @@ import com.google.inject.Provides;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.ItemComposition;
 import net.runelite.api.ScriptID;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.ScriptPreFired;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.events.WidgetClosed;
@@ -133,6 +135,38 @@ public class ShopPricesPlugin extends Plugin {
         if (event.getVarpId() == SHOP_QUANTITY_VARP_ID) {
             this.activeShop.quantityOption = ShopQuantity.getById(event.getValue());
             log.debug("Shop quantity option set to \"{}\". ({})", event.getValue(), this.activeShop.quantityOption.getOption());
+        }
+    }
+
+    @Subscribe
+    protected void onMenuOptionClicked(MenuOptionClicked event) {
+        if (this.activeShop == null) {
+            return;
+        }
+
+        if (!Shop.MENU_OPTIONS.contains(event.getMenuOption())) {
+            return;
+        }
+
+        if (this.config.blockOnThreshold()) {
+            Widget eventWidget = event.getWidget();
+
+            if (eventWidget == null) {
+                return;
+            }
+
+            ItemComposition itemComposition = itemManager.getItemComposition(event.getItemId());
+            int multiplierThreshold = this.config.priceThreshold();
+            int currentStock = eventWidget.getItemQuantity();
+
+            if (this.activeShop.isPriceAtThreshold(itemComposition, multiplierThreshold, currentStock)) {
+                event.consume();
+                return;
+            }
+
+            if (this.config.blockCheckQuantity() && this.activeShop.isQuantityAtThreshold(itemComposition, multiplierThreshold, currentStock)) {
+                event.consume();
+            }
         }
     }
 }

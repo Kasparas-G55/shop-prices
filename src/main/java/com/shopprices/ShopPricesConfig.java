@@ -68,4 +68,24 @@ public interface ShopPricesConfig extends Config {
     default Color thresholdOverlayColor() {
         return new Color(221, 69, 69);
     }
+
+    @ConfigItem(
+        position = 6,
+        keyName = "blockOnThreshold",
+        name = "Block buy on threshold",
+        description = "Blocks buying when multiplier is past threshold."
+    )
+    default boolean blockOnThreshold() {
+        return false;
+    }
+
+    @ConfigItem(
+        position = 7,
+        keyName = "blockCheckQuantity",
+        name = "Check buy quantity on Block",
+        description = "Blocks buying if the quantity will go past threshold. (Block on Threshold needs to be ON)"
+    )
+    default boolean blockCheckQuantity() {
+        return false;
+    }
 }
