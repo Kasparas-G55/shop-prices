@@ -1,6 +1,36 @@
 # Changelog
 
 
+## v1.2.0
+
+[compare changes](https://github.com/Kasparas-G55/shop-prices/compare/c65e6df54e7ff16d9c2cc9e3cda3f46fd79c0b1e...799cfab1e3d5f036b453e9819cb219edf13806e0)
+
+### 🚀 Enhancements
+
+- Extend Shops.ITEMS interface scroll height ([#15](https://github.com/Kasparas-G55/shop-prices/pull/15))
+- Blocking buying when at threshold ([799cfab](https://github.com/Kasparas-G55/shop-prices/commit/799cfab))
+
+### 🩹 Fixes
+
+- Display exact price in tooltip ([7582ec4](https://github.com/Kasparas-G55/shop-prices/commit/7582ec4))
+- Greedily split spaces and update shop-scrapper module ([#20](https://github.com/Kasparas-G55/shop-prices/pull/20))
+
+### 💅 Refactors
+
+- Set shopName using shop_main_init clientscript ([1dba4eb](https://github.com/Kasparas-G55/shop-prices/commit/1dba4eb))
+- Move from Overlay to WidgetItemOverlay ([#17](https://github.com/Kasparas-G55/shop-prices/pull/17))
+- Get shop quantity option from varp value ([ebd6afa](https://github.com/Kasparas-G55/shop-prices/commit/ebd6afa))
+- Move activeShop field to plugin class ([4bcb124](https://github.com/Kasparas-G55/shop-prices/commit/4bcb124))
+
+### 📖 Documentation
+
+- Small documentation changes ([5719edd](https://github.com/Kasparas-G55/shop-prices/commit/5719edd))
+
+### ❤️ Contributors
+
+- Kasparas Galdikas ([@Kasparas-G55](https://github.com/Kasparas-G55))
+
+
 ## v1.1.2
 
 [compare changes](https://github.com/Kasparas-G55/shop-prices/compare/a3516db...63e3b4b)
