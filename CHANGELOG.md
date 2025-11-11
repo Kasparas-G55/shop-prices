@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v1.2.1
+
+[compare changes](https://github.com/Kasparas-G55/shop-prices/compare/03b214d7082adc80cf4f7d60e60f302abf8a9238...c410df90f99c81efd157b3f6cd90af551e31b92d)
+
+### 🩹 Fixes
+
+- Remove duplicate gp string ([c410df9](https://github.com/Kasparas-G55/shop-prices/commit/c410df9))
+
+### ❤️ Contributors
+
+- Kasparas Galdikas ([@Kasparas-G55](https://github.com/Kasparas-G55))
+
+
 ## v1.2.0
 
 [compare changes](https://github.com/Kasparas-G55/shop-prices/compare/c65e6df54e7ff16d9c2cc9e3cda3f46fd79c0b1e...799cfab1e3d5f036b453e9819cb219edf13806e0)
