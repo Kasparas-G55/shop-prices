@@ -9,6 +9,7 @@ import net.runelite.api.MenuAction;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.InventoryID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
@@ -32,6 +33,12 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
     private static final String THRESHOLD_BLOCK_TEXT = WARN_TAG + "Blocking - at threshold.";
     private static final String QUANTITY_BLOCK_TEXT = WARN_TAG + "Blocking - quantity will pass threshold.";
 
+    // FIXME: Item skip list, band-aid fix for issues like #21 and #22 until a proper solution is found.
+    // Add ID's for items that are very inaccurate in price.
+    private static final Set<Integer> ITEM_BLACKLIST = ImmutableSet.of(
+        ItemID.DISCOFRETURNING
+    );
+
     private final Client client;
     private final ItemManager itemManager;
     private final TooltipManager tooltipManager;
@@ -49,6 +56,10 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
     @Override
     public void renderItemOverlay(Graphics2D graphics, int itemId, WidgetItem itemWidget) {
         if (plugin.activeShop == null) {
+            return;
+        }
+
+        if (ITEM_BLACKLIST.contains(itemWidget.getId())) {
             return;
         }
 

@@ -18,6 +18,9 @@ public final class Shop {
     public static final String SHOP_KEY_PATTERN = "[^a-zA-Z ]+";
     public static final float MIN_SELL_MULTIPLIER = 30.0f;
 
+    /** Shop's formatted name */
+    String name;
+
     /** Shops default sell multiplier for every item */
     int sellMultiplier;
 

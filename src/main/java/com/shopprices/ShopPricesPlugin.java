@@ -97,7 +97,7 @@ public class ShopPricesPlugin extends Plugin {
     @Subscribe
     protected void onWidgetClosed(WidgetClosed event) {
         if (event.getGroupId() == InterfaceID.SHOPMAIN) {
-            log.debug("Closing shop \"{}\".", this.activeShop);
+            log.debug("Closing shop \"{}\".", this.activeShop.name);
             this.activeShop = null;
         }
     }
@@ -110,6 +110,7 @@ public class ShopPricesPlugin extends Plugin {
             String shopKey = Shop.formatShopName(name);
 
             this.activeShop = shopsMap.get(shopKey);
+            this.activeShop.name = shopKey;
             log.debug("Opened shop \"{}\". ({})", name, shopKey);
         }
 
