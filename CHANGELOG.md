@@ -1,6 +1,19 @@
 # Changelog
 
 
+# v1.2.2
+
+[compare changes](https://github.com/Kasparas-G55/shop-prices/compare/af3d39b1aa410122668972b3d7fff0f4428794b3...5e8fc7de3bd887083feae777b52e73094ec4554b)
+
+### 🩹 Fixes
+
+- Item skip list for very inaccurate prices ([5e8fc7d](https://github.com/Kasparas-G55/shop-prices/commit/5e8fc7d))
+
+### ❤️ Contributors
+
+- Kasparas Galdikas ([@Kasparas-G55](https://github.com/Kasparas-G55))
+
+
 ## v1.2.1
 
 [compare changes](https://github.com/Kasparas-G55/shop-prices/compare/03b214d7082adc80cf4f7d60e60f302abf8a9238...c410df90f99c81efd157b3f6cd90af551e31b92d)
