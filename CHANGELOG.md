@@ -1,7 +1,19 @@
 # Changelog
 
+## v1.2.3
 
-# v1.2.2
+[compare changes](https://github.com/Kasparas-G55/shop-prices/compare/b63365df29072587d1ff67d5b07588f1e9e9883f...339111d8b37ad63e5fef7037e90a81963981f630)
+
+### 🏡 Chore
+
+- Update shop data ([339111d](https://github.com/Kasparas-G55/shop-prices/commit/339111d))
+
+### ❤️ Contributors
+
+- Kasparas-G55 ([@Kasparas-G55](https://github.com/Kasparas-G55))
+
+
+## v1.2.2
 
 [compare changes](https://github.com/Kasparas-G55/shop-prices/compare/af3d39b1aa410122668972b3d7fff0f4428794b3...5e8fc7de3bd887083feae777b52e73094ec4554b)
 
