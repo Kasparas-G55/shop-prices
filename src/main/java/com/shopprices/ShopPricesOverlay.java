@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Color;
+import java.awt.Font;
 import java.util.Set;
 
 @Slf4j
@@ -91,7 +92,14 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
 
         parentBounds.setSize(parentBounds.width + WIDTH_CLIP_PADDING, parentBounds.height);
 
+        Font font = new Font(
+            plugin.getConfig().defaultOverlayFont(),
+            Font.PLAIN,
+            plugin.getConfig().defaultOverlayFontSize()
+        );
+
         graphics.setClip(parentBounds);
+        graphics.setFont(font);
         graphics.drawString(sellValue, bounds.x, (int) bounds.getMaxY() + PRICE_PADDING);
     }
 
@@ -116,11 +124,7 @@ public class ShopPricesOverlay extends WidgetItemOverlay {
             return;
         }
 
-        if (!Shop.MENU_ACTIONS.contains(type)) {
-            return;
-        }
-
-        if (!Shop.MENU_OPTIONS.contains(option)) {
+        if (!Shop.MENU_ACTIONS.contains(type) || !Shop.MENU_OPTIONS.contains(option)) {
             return;
         }
 

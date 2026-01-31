@@ -41,6 +41,26 @@ public interface ShopPricesConfig extends Config {
 
     @ConfigItem(
         position = 3,
+        keyName = "overlayFont",
+        name = "Shop price font",
+        description = "Sets the default item value font."
+    )
+    default String defaultOverlayFont() {
+        return "RuneScape Small";
+    }
+
+    @ConfigItem(
+        position = 4,
+        keyName = "overlayFontSize",
+        name = "Shop price font size",
+        description = "Sets the default item value font size."
+    )
+    default int defaultOverlayFontSize() {
+        return 16;
+    }
+
+    @ConfigItem(
+        position = 5,
         keyName = "enablePriceThreshold",
         name = "Enable price threshold",
         description = "Allows you to set a threshold for when a price reaches a certain percentage."
@@ -50,7 +70,7 @@ public interface ShopPricesConfig extends Config {
     }
 
     @ConfigItem(
-        position = 4,
+        position = 6,
         keyName = "priceThresholdPercentage",
         name = "Threshold Percentage",
         description = "Sets the threshold percentage."
@@ -60,7 +80,7 @@ public interface ShopPricesConfig extends Config {
     }
 
     @ConfigItem(
-        position = 5,
+        position = 7,
         keyName = "priceThresholdColor",
         name = "Price threshold color",
         description = "Sets the threshold item value color."
@@ -70,7 +90,7 @@ public interface ShopPricesConfig extends Config {
     }
 
     @ConfigItem(
-        position = 6,
+        position = 8,
         keyName = "blockOnThreshold",
         name = "Block buy on threshold",
         description = "Blocks buying when multiplier is past threshold."
@@ -80,7 +100,7 @@ public interface ShopPricesConfig extends Config {
     }
 
     @ConfigItem(
-        position = 7,
+        position = 9,
         keyName = "blockCheckQuantity",
         name = "Check buy quantity on Block",
         description = "Blocks buying if the quantity will go past threshold. (Block on Threshold needs to be ON)"
