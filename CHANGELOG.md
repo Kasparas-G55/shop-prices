@@ -1,5 +1,19 @@
 # Changelog
 
+
+## v1.2.4
+
+[compare changes](https://github.com/Kasparas-G55/shop-prices/compare/c7b0959d6e97a17123c1246af9d72a24cde4c853...04c5bfb830a396642e88ada12c0e19da387ededd)
+
+### 🩹 Fixes
+
+- Configurable font and font size ([04c5bfb](https://github.com/Kasparas-G55/shop-prices/commit/04c5bfb))
+
+### ❤️ Contributors
+
+- Kasparas-G55 ([@Kasparas-G55](https://github.com/Kasparas-G55))
+
+
 ## v1.2.3
 
 [compare changes](https://github.com/Kasparas-G55/shop-prices/compare/b63365df29072587d1ff67d5b07588f1e9e9883f...339111d8b37ad63e5fef7037e90a81963981f630)
